@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  splunk-main:
+    image: splunk/splunk:latest
+    platform: linux/amd64
+    ports:
+      - "8000:8000"
+      - "8089:8089"
+      - "8088:8088"
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=Uvish123@
+      - OPTIMISTIC_ABOUT_FILE_LOCKING=1
+    volumes:
+      - splunk-var:/opt/splunk/var
+      - splunk-etc:/opt/splunk/etc
+
+volumes:
+  splunk-var:
+  splunk-etc:

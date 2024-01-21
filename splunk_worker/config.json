@@ -1,0 +1,6 @@
+{
+    "splunk":{
+        "HEC_URL": "http://localhost:8088/services/collector/event",
+        "Token": "7aef6cf6-8050-4258-9c36-cd68b0c79660"
+    }
+}

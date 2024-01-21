@@ -1,11 +1,12 @@
 {
-  "name": "log_generator",
+  "name": "splunk_worker",
   "version": "1.0.0",
   "description": "app to generate logs for splunk HEC",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "author": "ujjwal",
   "license": "ISC",

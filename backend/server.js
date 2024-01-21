@@ -1,5 +1,7 @@
 const express = require('express');
 const axios = require('axios');
+const https = require('https');
+const cors = require('cors')
 
 const app = express();
 const port = 3000;
@@ -10,35 +12,49 @@ var splunkjs = require('splunk-sdk');
 const splunkConfig = conf.splunk;
 const service = new splunkjs.Service(splunkConfig);
 
+app.use(cors());
+
+// proxy for splunk rest calls from frontend , to bypass cors
+const proxy = require('./proxy');
+
+// To prevent caching of responses
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
+
+app.use('/proxy',proxy);
 
 app.get('/overview', async (req, res) => {
+  
   try {
-    const dashboards = await getDashboards();
-    const reports = await getReports();
-    const lookups = await getLookups();
-    const savedSearches = await getSavedSearches();
-    const indexes = await getIndexes();
-    const fields = await getFields();
-    const apps = await getApps();
-    // const sourcetype = await getSourceTypeCount();
-    // console.log(sourcetype)
-    
-    // Add similar calls for searches, alerts, lookups, and fields
-
-    // console.log(dashboards.paging)
-    res.json({
-      dashboards: dashboards.total,
-      reports: reports.total,
-      lookups: lookups.total,
-      savedSearches: savedSearches.total,
-      indexes: indexes.total,
-      fields: fields.total,
-      apps: apps.total
+    res.json({ 
+      dashboards: (await getList("Dashboard")).length,
+      reports: (await getList("Report")).length,
+      lookups: (await getList("Lookup")).length,
+      savedSearches: (await getList("SavedSearch")).length,
+      indexes: (await getList("Index")).length,
+      apps: (await getList("App")).length,
+      alerts: (await getList("Alert")).length
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Unexpected error:', error);
+    res.status(500).json({ error: 'Unexpected error' });
   }
 });
+
+app.get("/values", async (req,res)=>{
+  try{
+    res.json({
+      values : await getAllFieldValues(req.query.field)
+    });
+  }
+  catch (error) {
+    console.error('Unexpected error:', error);
+    res.status(500).json({ error: 'Unexpected error' });
+  }
+})
+
 
 app.get('/list', async (req, res) => {
   const type = req.query.type;
@@ -46,25 +62,37 @@ app.get('/list', async (req, res) => {
   try {
     switch (type) {
       case 'dashboards':
-        res.json({ dashboards: await getDashboards() });
+        res.json({ dashboards: await getList("Dashboard", req.query.splunk_host) });
         break;
       case 'reports':
-        res.json({ reports: await getReports() });
+        res.json({ reports: await getList("Report", req.query.splunk_host) });
         break;
       case 'lookups':
-        res.json({ lookups: await getLookups() });
+        res.json({ lookups: await getList("Lookup", req.query.splunk_host) });
         break;
       case 'savedSearches':
-        res.json({ savedSearches: await getSavedSearches() });
+        res.json({ savedSearches: await getList("SavedSearch", req.query.splunk_host) });
         break;
       case 'indexes':
-        res.json({ indexes: await getIndexes() });
+        res.json({ indexes: await getList("Index", req.query.splunk_host) });
         break;
+      case 'alerts':
+        res.json({ alerts: await getList("Alert", req.query.splunk_host) });
+        break;        
+      case 'apps':
+        res.json({ apps: await getList("App", req.query.splunk_host) });
+        break;
+      case 'all':
+        res.json({ 
+          dashboards: await getList("Dashboard" , req.query.splunk_host),
+          reports: await getList("Report" , req.query.splunk_host),
+          lookups: await getList("Lookup" , req.query.splunk_host),
+          savedSearches: await getList("SavedSearch" , req.query.splunk_host),
+          indexes: await getList("Index" , req.query.splunk_host),
+          alerts: await getList("Alert" , req.query.splunk_host)
+        })
       // case 'fields':
       //   res.json({ fields: await getFields() });
-      //   break;
-      case 'apps':
-        res.json({ apps: await getApps() });
         break;
       default:
         res.status(400).json({ error: 'Invalid type parameter' });
@@ -75,10 +103,18 @@ app.get('/list', async (req, res) => {
 });
 
 app.get('/search', async (req, res) => {
-  const query = req.query.q;
-
+  const keyword = req.query.q;
+  const query = `index=main AND 
+  type="*${keyword}*" OR
+  splunk_host="*${keyword}*" OR
+  custom_classification="*${keyword}*" OR
+  custom_meta_label="*${keyword}*" OR
+  object_info.description="*${keyword}*" OR
+  object_info.name="*${keyword}*" OR
+  object_info.owner="*${keyword}*"
+  `;
   try {
-    const searchResults = await runOneshotSearch(query);
+    const searchResults = await searchSplunk(query);
     res.json({ searchResults });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -107,10 +143,33 @@ app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
+
+
+async function getList(object,splunk_host){
+  let searchQuery = splunk_host? `index="main" type="${object}" splunk_host="${splunk_host}"` : `index="main" type="${object}"`;
+      let response = await searchSplunk(searchQuery);
+      // console.log(response[0].rows)
+      return response[0].rows;
+}
+
+async function getAllFieldValues(field){
+  let searchQuery = `index="main" | stats values(${field}) as ${field}`;
+  let response = await searchSplunk(searchQuery);
+  return response[0].rows[0][0];
+}
+
+
 // Functions for fetching data from Splunk
 async function getDashboards() {
-    const response = await service.request('/servicesNS/-/-/data/ui/views', 'GET');
-    return {list:response.data.entry,total:response.data.paging.total};
+    let searchQuery = 'index="main" type="Dashboard"';
+      let response = await searchSplunk(searchQuery);
+      console.log(response[0].rows)
+      return response[0].rows;
+}
+
+async function getAlerts(){
+  const response = await service.request('/services/alerts', 'GET');
+  return {list:response.data.entry,total:response.data.entry.length}
 }
 
 async function getReports() {
@@ -170,7 +229,6 @@ async function searchSplunk(query) {
   });
   search_job = await search_job.fetch();
   let response = await search_job.results({count:0});
-  console.log(response)
   return response
 }
 

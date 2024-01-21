@@ -1,10 +1,10 @@
 {
     "splunk":{
-        "username":"uvish66@gmail.com",
+        "username":"admin",
         "password":"Uvish123@",
         "host":"localhost",
         "port":"8089",
-        "scheme": "http"
+        "scheme": "https"
     },
     "app":{
         "port":3000
