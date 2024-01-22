@@ -4,12 +4,13 @@ const https = require('https');
 const cors = require('cors')
 
 const app = express();
-const port = 3000;
+
 
 const conf = require('./config.json');
 var splunkjs = require('splunk-sdk');
 
 const splunkConfig = conf.splunk;
+const port = conf.app.port;
 const service = new splunkjs.Service(splunkConfig);
 
 app.use(cors());
@@ -265,3 +266,7 @@ const runOneshotSearch = async (query) => {
 // | eval artifact_type="index", source="indexes"
 // | search title=*main*
 // | table title, artifact_type, source
+
+
+// to get fields
+// index="main" | fieldsummary
