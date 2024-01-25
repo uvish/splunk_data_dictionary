@@ -34,10 +34,9 @@ const Dashbaord = () => {
         },[]);
 
 
-  const splunk_server_url = config.splunk.server_url;
-
-  const LOGIN_ENDPOINT = splunk_server_url+`/proxy/services/auth/login`;
-  const USER_DETAILS_ENDPOINT = splunk_server_url+`/proxy/services/authentication/users`;
+  const SPLUNK_SERVER_URL = config.splunk.server_url;
+  const LOGIN_ENDPOINT = `${SPLUNK_SERVER_URL}/proxy/services/auth/login`;
+  const USER_DETAILS_ENDPOINT = `${SPLUNK_SERVER_URL}/proxy/services/authentication/users`;
   const JSON_OUTPUT = `?output_mode=json`;
 
 
@@ -50,6 +49,7 @@ const Dashbaord = () => {
                 });
 
         if(userDetailsResponse.data.entry){
+            console.log(userDetailsResponse.data.entry[0].content.roles)
                 setRoles(userDetailsResponse.data.entry[0].content.roles)
                 // setRoles[roles];
                 setLoading(false);
@@ -77,12 +77,12 @@ const Dashbaord = () => {
     <div>
      <h1>Dashboard</h1>
      {/* <h2>{roles}</h2> */}
-     <TabContainer/>
+     <TabContainer roles={roles}/>
     </div>
   );
 };
 
-function TabContainer() {
+function TabContainer({ roles }) {
     const [activePanelId, setActivePanelId] = useState('overview');
     const handleChange = (e, { activePanelId: panelId }) => {
         setActivePanelId(panelId);
@@ -94,10 +94,10 @@ function TabContainer() {
                <Overview/>
             </TabLayout.Panel>
             <TabLayout.Panel label="KOs" panelId="kos" style={{ margin: 20 }}>
-               <KO/>
+               <KO roles={roles}/>
             </TabLayout.Panel>
             <TabLayout.Panel label="Data Inventory" panelId="data_inventory" style={{ margin: 20 }}>
-               <DataInventory/>
+               <DataInventory roles={roles}/>
             </TabLayout.Panel>
         </TabLayout>
     );

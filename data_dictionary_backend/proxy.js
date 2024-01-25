@@ -6,10 +6,10 @@ const httpProxy = require('http-proxy');
 const proxy = httpProxy.createProxyServer({ secure: false });
 
 const conf = require('./config.json');
-const splunkConfig = conf.splunk;
+const splunkConfig = conf.splunk_dictionary_instance;
 
 router.all('/*', (req, res) => {
-  const targetUrl = splunkConfig.scheme+'://'+splunkConfig.host+':'+splunkConfig.port + req.originalUrl.replace(/^\/proxy/, '');
+  const targetUrl = splunkConfig.hostname + req.originalUrl.replace(/^\/proxy/, '');
   console.log("Proxy:"+targetUrl);
   proxy.web(req, res, { target: targetUrl ,ignorePath: true });
 });

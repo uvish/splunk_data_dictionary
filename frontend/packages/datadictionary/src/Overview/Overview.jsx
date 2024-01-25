@@ -1,9 +1,10 @@
 import React, { useState ,useEffect } from 'react';
-import styles from './Overview.style.json';
+
 import axios from 'axios';
 
 // Splunk UI Components
 import Card from '@splunk/react-ui/Card';
+import styles from './Overview.style.json';
 
 // Util Functions
 import Session from '../Utils/Session';

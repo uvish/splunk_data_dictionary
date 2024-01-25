@@ -1,0 +1,30 @@
+{
+    "splunk_instances":[
+        {
+            "name": "US",
+            "hostname": "https://localhost:1089",
+            "username": "admin",
+            "password": "Uvish123@"
+        },
+        {
+            "name": "EMEA",
+            "hostname": "https://localhost:2089",
+            "username": "admin",
+            "password": "Uvish123@"
+        },
+        {
+            "name": "APAC",
+            "hostname": "https://localhost:3089",
+            "username": "admin",
+            "password": "Uvish123@"
+        }
+    ],
+    "splunk_dictionary_instance":{
+        "hostname": "https://localhost:8089",
+        "username": "admin",
+        "password": "Uvish123@",
+        "collectionName": "data_dictionary",
+        "ledgerCollectionName": "splunk_hosts",
+        "appName": "splunk_data_dictionary"
+    }
+}
