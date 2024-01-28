@@ -5,13 +5,13 @@ const StyledContainer = styled.div`
     ${mixins.reset('inline-block')};
     font-size: ${variables.fontSizeLarge};
     line-height: 200%;
-    margin: ${variables.spacing} ${variables.spacingHalf};
+    margin: 0;
     padding: ${variables.spacing} calc(${variables.spacing} * 2);
     border-radius: ${variables.borderRadius};
     box-shadow: ${variables.overlayShadow};
     background-color: ${variables.backgroundColor};
-    height: 95vh;
-    width: 98vw;
+    height: 100vh;
+    width: 100vw;
     display: flex;
     flex-direction:column;
     align-items: centre;

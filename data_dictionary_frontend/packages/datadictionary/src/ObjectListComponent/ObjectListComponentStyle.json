@@ -1,0 +1,23 @@
+{
+    "topContainer":{
+        "display":"flex",
+        "flex-direction":"row",
+        "justify-content":"space-between",
+        "margin": "20px"
+    },
+    "selectorContainer":{
+        "display":"flex",
+        "flex-direction":"row",
+        "justify-content":"start"
+    },
+    "searchBar":{
+    },
+    "tableContainer":{
+        "margin":"10px"
+    },
+    "banner":{
+        "position":"absolute",
+        "top":"35px",
+        "right":"35px"
+    }
+}

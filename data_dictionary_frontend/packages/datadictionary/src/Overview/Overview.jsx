@@ -69,8 +69,8 @@ const Overview = () =>{
 
 const CustomCard =({name,count})=>{
     return (
-        <Card>
-        <Card.Body>
+        <Card style={styles.card}>
+            <Card.Body >
             <div style={styles.cardContainer}>
                 <div style={styles.header}>{count}</div>
                 <div style={styles.title}>{name}</div>

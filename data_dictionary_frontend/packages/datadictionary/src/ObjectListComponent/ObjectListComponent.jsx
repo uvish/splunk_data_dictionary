@@ -22,11 +22,19 @@ import TrashCanCross from '@splunk/react-icons/TrashCanCross';
 import NodeSplit from '@splunk/react-icons/NodeSplit';
 import Clock from '@splunk/react-icons/Clock';
 import Tooltip from '@splunk/react-ui/Tooltip';
+import TransitionOpen from '@splunk/react-ui/TransitionOpen';
+import { AnimationToggleProvider } from '@splunk/react-ui/AnimationToggle';
+import SplitButton from '@splunk/react-ui/SplitButton';
+import Search from '@splunk/react-ui/Search';
+import Layer from '@splunk/react-ui/Layer';
 
 import P from '@splunk/react-ui/Paragraph';
 
 // Helper Functions
 import Session from '../Utils/Session';
+
+//Custom Style
+import styles from './ObjectListComponentStyle.json'
 
 const enterpriseIconProps = {
     hideDefaultTooltip: true,
@@ -47,6 +55,7 @@ const APPROVE_REQUEST = `${SPLUNK_SERVER_URL}/approve-request`;
 const DENY_REQUEST = `${SPLUNK_SERVER_URL}/cancelRequest`;
 const DELETE_OBJECT = `${SPLUNK_SERVER_URL}/deleteObject`;
 const RECORDS_PER_PAGE = 15;
+const BANNER_TIMEOUT = 3000; // ms
 
 const enterpriseIcons = {
     Hosts: <Globe {...enterpriseIconProps} variant="filled" />,
@@ -156,7 +165,7 @@ const ObjectListComponent = ({ roles, objectList, defaultObject }) => {
         setBannerMessage(message);
         setTimeout(() => {
             setShowMessage(false);
-        }, 3000);
+        }, BANNER_TIMEOUT);
     };
 
     useEffect(() => {
@@ -286,6 +295,7 @@ const ObjectListComponent = ({ roles, objectList, defaultObject }) => {
         );
         if (response['_key']) {
             handleEditModalClose();
+            showBanner('Saved')
         } else {
             alert('Update Failed !');
         }
@@ -358,6 +368,11 @@ const ObjectListComponent = ({ roles, objectList, defaultObject }) => {
 
     return (
         <div>
+            {showMessage && (
+                        <div style={styles.banner}>
+                            <MessageBar  type="info">{bannerMessage}</MessageBar>
+                        </div>
+            )}
             <Modal
                 onRequestClose={handleRequestClickAway}
                 open={editModal}
@@ -443,6 +458,9 @@ const ObjectListComponent = ({ roles, objectList, defaultObject }) => {
                     <Button appearance="secondary" onClick={handleEditModalClose} label="Close" />
                 </Modal.Footer>
             </Modal>
+
+            <div style={styles.topContainer}>
+            <div style={styles.selectorContainer}>
             <Select value={selectorValue} onChange={selectChange}>
                 {objectList.map((item,index)=>(
                      <Select.Option
@@ -473,102 +491,127 @@ const ObjectListComponent = ({ roles, objectList, defaultObject }) => {
                     onClick={handleApproveRequestModalOpen}
                 />
             )}
+            </div>
 
-            <Text
-                type="text"
-                id="search"
-                name="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+                <div style={styles.searchBar}>
+                <Search inline onChange={(e) => setSearchTerm(e.target.value)} value={searchTerm} />
+                </div>
+            </div>
             {isLoading ? (
                 <div>Loading..</div>
             ) : (
                 <div>
-                    <Table stripeRows>
-                        <Table.Head>
-                            {/* <Table.HeadCell>Id</Table.HeadCell> */}
-                            <Table.HeadCell>Name</Table.HeadCell>
-                            <Table.HeadCell>Description</Table.HeadCell>
-                            <Table.HeadCell>Owner</Table.HeadCell>
-                            <Table.HeadCell>Meta Label</Table.HeadCell>
-                            <Table.HeadCell>Classification</Table.HeadCell>
-                            <Table.HeadCell>Splunk Host</Table.HeadCell>
-                            <Table.HeadCell>Action</Table.HeadCell>
-                        </Table.Head>
-                        <Table.Body>
-                            {paginatedData.map((row) => (
-                                <Table.Row key={row.id}>
-                                    {/* <Table.Cell>{row.id}</Table.Cell> */}
-                                    <Table.Cell>{row.object_info.name}</Table.Cell>
-                                    <Tooltip contentRelationship="label" content={(row.object_info.description)} style={{ margin: '0 10px' }}>
-                                    <Table.Cell>{truncateText(row.object_info.description,100)}</Table.Cell>
-                                    </Tooltip>
-                                    <Table.Cell>{row.object_info.owner}</Table.Cell>
-                                    <Table.Cell>{row.custom_meta_label}</Table.Cell>
-                                    <Table.Cell>{row.custom_classification}</Table.Cell>
-                                    <Table.Cell>{row.splunk_host}</Table.Cell>
-                                    <Table.Cell>
-                                        {isAdmin ? (
-                                            <div>
-                                            <Button
-                                                onClick={() => {
-                                                    handleEditModalOpen(row);
-                                                }}
-                                                ref={modalToggle}
-                                                label="Edit"
-                                                icon={enterpriseIcons.Edit}
-                                            />
-                                            <Button
-                                                onClick={() => {
-                                                    handleDeleteObject(row);
-                                                }}
-                                                label="Delete"
-                                                icon={enterpriseIcons.Trash}
-                                            />
-                                            </div>
-                                            
-                                        ) : (
-                                            <Button
-                                                onClick={() => {
-                                                    if (row.access_status === 'requested') {
-                                                        cancelRequest(row);
-                                                    } else if (row.access_status === 'approved') {
-                                                        copyToClipboard(row.id)
-                                                        showBanner('Copied to clipboard');
-                                                    } else {
-                                                        handleGetAccess(row);
-                                                    }
-                                                }}
-                                                ref={modalToggle}
-                                                label={
-                                                    row.access_status === 'requested'
-                                                        ? 'Requested'
-                                                        : row.access_status === 'approved'
-                                                        ? 'Share'
-                                                        : 'Get Access'
-                                                }
-                                                icon={
-                                                    row.access_status === 'requested'
-                                                    ? enterpriseIcons.Wait
-                                                    : row.access_status === 'approved'
-                                                    ? enterpriseIcons.Share : enterpriseIcons.GetAccess
-                                                }
-                                            />
-                                        )}
-                                    </Table.Cell>
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-                    </Table>
-
+                    <div style={styles.tableContainer}>
+                            <Table stripeRows>
+                                <Table.Head>
+                                    {/* <Table.HeadCell>Id</Table.HeadCell> */}
+                                    <Table.HeadCell>Name</Table.HeadCell>
+                                    <Table.HeadCell>Description</Table.HeadCell>
+                                    <Table.HeadCell>Owner</Table.HeadCell>
+                                    <Table.HeadCell>Meta Label</Table.HeadCell>
+                                    <Table.HeadCell>Classification</Table.HeadCell>
+                                    <Table.HeadCell>Splunk Host</Table.HeadCell>
+                                    <Table.HeadCell>Action</Table.HeadCell>
+                                </Table.Head>
+                                <Table.Body>
+                                    {paginatedData.map((row) => (
+                                        <Table.Row key={row.id}>
+                                            {/* <Table.Cell>{row.id}</Table.Cell> */}
+                                            <Table.Cell>{row.object_info.name}</Table.Cell>
+                                            <Tooltip contentRelationship="label" content={(row.object_info.description)} style={{ margin: '0 10px' }}>
+                                            <Table.Cell>{truncateText(row.object_info.description,100)}</Table.Cell>
+                                            </Tooltip>
+                                            <Table.Cell>{row.object_info.owner}</Table.Cell>
+                                            <Table.Cell>{row.custom_meta_label}</Table.Cell>
+                                            <Table.Cell>{row.custom_classification}</Table.Cell>
+                                            <Table.Cell>{row.splunk_host}</Table.Cell>
+                                            <Table.Cell>
+                                                {isAdmin ? (
+                                                    <div>
+                                                         <SplitButton appearance="primary">
+                                                            <SplitButton.Item  onClick={() => {
+                                                                 handleEditModalOpen(row);
+                                                                 }}>Edit</SplitButton.Item>
+                                                            <SplitButton.Item onClick={() => {
+                                                                 handleDeleteObject(row);
+                                                        }}>Delete</SplitButton.Item>
+                                                            <SplitButton.Item onClick={()=>{
+                                                                copyToClipboard(row.id)
+                                                                showBanner('Copied to clipboard');
+                                                            }}>Share</SplitButton.Item>
+                                                        </SplitButton>
+                                                    {/* <Button
+                                                        onClick={() => {
+                                                            handleEditModalOpen(row);
+                                                        }}
+                                                        ref={modalToggle}
+                                                        label="Edit"
+                                                        icon={enterpriseIcons.Edit}
+                                                    />
+                                                    <Button
+                                                        onClick={() => {
+                                                            handleDeleteObject(row);
+                                                        }}
+                                                        label="Delete"
+                                                        icon={enterpriseIcons.Trash}
+                                                    /> */}
+                                                    </div>
+                                                    
+                                                ) : (
+                                                    <Button
+                                                        onClick={() => {
+                                                            if (row.access_status === 'requested') {
+                                                                cancelRequest(row);
+                                                            } else if (row.access_status === 'approved') {
+                                                                copyToClipboard(row.id)
+                                                                showBanner('Copied to clipboard');
+                                                            } else {
+                                                                handleGetAccess(row);
+                                                            }
+                                                        }}
+                                                        ref={modalToggle}
+                                                        label={
+                                                            row.access_status === 'requested'
+                                                                ? 'Requested'
+                                                                : row.access_status === 'approved'
+                                                                ? 'Share'
+                                                                : 'Get Access'
+                                                        }
+                                                        icon={
+                                                            row.access_status === 'requested'
+                                                            ? enterpriseIcons.Wait
+                                                            : row.access_status === 'approved'
+                                                            ? enterpriseIcons.Share : enterpriseIcons.GetAccess
+                                                        }
+                                                    />
+                                                )}
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table>
+                </div>
                     <Paginator
                         onChange={handlePaginatorChange}
                         current={pageNum}
                         alwaysShowLastPageLink
                         totalPages={totalPages}
                     />
-                    {showMessage && <MessageBar type="info">{bannerMessage}</MessageBar>}
+                    {/* {showMessage && (
+                        <div>
+                            <MessageBar type="info"  style={{
+                                    position: 'absolute',
+                                    bottom: '5%',
+                                    right: '5%',
+                                    width: '300px',
+                                    height: '100px',
+                                    backgroundColor: 'crimson',
+                                    borderRadius: '3px',
+                                }}>{bannerMessage}</MessageBar>
+                        </div>
+                    )
+                    } */}
+                    
                 </div>
             )}
         </div>
