@@ -26,6 +26,4 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm run build_frontend
-    - run: npm run build_backend
-    - run: npm run build_enumerator
+    - run: npm run build --prefix data_dictionary_frontend/packages/datadictionary
