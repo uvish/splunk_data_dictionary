@@ -7,13 +7,6 @@ import Fuse from 'fuse.js';
 
 // Splunk UI Components
 import Select from '@splunk/react-ui/Select';
-import TableSlide from '@splunk/react-icons/TableSlide';
-import List from '@splunk/react-icons/List';
-import CylinderIndex from '@splunk/react-icons/CylinderIndex';
-import CirclesFour from '@splunk/react-icons/CirclesFour';
-import ChartColumnSquare from '@splunk/react-icons/ChartColumnSquare';
-import CylinderMagnifier from '@splunk/react-icons/CylinderMagnifier';
-import BellDot from '@splunk/react-icons/BellDot';
 import Table from '@splunk/react-ui/Table';
 import Paginator from '@splunk/react-ui/Paginator';
 import Globe from '@splunk/react-icons/Globe';
@@ -28,7 +21,6 @@ import MessageBar from '@splunk/react-ui/MessageBar';
 import TrashCanCross from '@splunk/react-icons/TrashCanCross';
 import NodeSplit from '@splunk/react-icons/NodeSplit';
 import Clock from '@splunk/react-icons/Clock';
-import { ScrollContainer } from '../CommonStyles';
 import Tooltip from '@splunk/react-ui/Tooltip';
 
 import P from '@splunk/react-ui/Paragraph';
@@ -57,13 +49,6 @@ const DELETE_OBJECT = `${SPLUNK_SERVER_URL}/deleteObject`;
 const RECORDS_PER_PAGE = 15;
 
 const enterpriseIcons = {
-    Apps: <CirclesFour {...enterpriseIconProps} variant="filled" />,
-    Dashboards: <ChartColumnSquare {...enterpriseIconProps} variant="filled" />,
-    SavedSearchs: <CylinderMagnifier {...enterpriseIconProps} variant="filled" />,
-    Alerts: <BellDot {...enterpriseIconProps} variant="filled" />,
-    Lookups: <TableSlide {...enterpriseIconProps} variant="filled" />,
-    Fields: <List {...enterpriseIconProps} variant="filled" />,
-    Indexes: <CylinderIndex {...enterpriseIconProps} variant="filled" />,
     Hosts: <Globe {...enterpriseIconProps} variant="filled" />,
     Edit: <Pencil {...enterpriseIconProps} />,
     GetAccess: <ChevronsDoubleDownGuillemets {...enterpriseIconProps} />,
@@ -83,9 +68,9 @@ const fuseOptions = {
     ],
 };
 
-const DataInventory = ({ roles }) => {
+const ObjectListComponent = ({ roles, objectList, defaultObject }) => {
     const [data, setData] = useState([]);
-    const [selectorValue, setSelectorValue] = useState('lookups');
+    const [selectorValue, setSelectorValue] = useState(defaultObject);
     const [isLoading, setLoading] = useState('true');
     const [overview, setOverview] = useState({});
     const [pageNum, setPageNum] = useState(1);
@@ -106,7 +91,6 @@ const DataInventory = ({ roles }) => {
     const [showMessage, setShowMessage] = useState(false);
 
     const isAdmin = roles.includes('admin');
-
     const handleEditModalOpen = (object) => {
         let metaLabels = [];
         let customClassification = '';
@@ -459,23 +443,15 @@ const DataInventory = ({ roles }) => {
                     <Button appearance="secondary" onClick={handleEditModalClose} label="Close" />
                 </Modal.Footer>
             </Modal>
-
             <Select value={selectorValue} onChange={selectChange}>
-                <Select.Option
-                    label={'Lookups' + ` ${overview.apps ? overview.lookups : '..'}`}
-                    value="lookups"
-                    icon={enterpriseIcons['Lookups']}
-                />
-                <Select.Option
-                    label={'Fields' + ` ${overview.dashboards ? overview.fields : '..'}`}
-                    value="fields"
-                    icon={enterpriseIcons['Fields']}
-                />
-                <Select.Option
-                    label={'Index' + ` ${overview.savedSearches ? overview.indexes : '..'}`}
-                    value="indexes"
-                    icon={enterpriseIcons['Indexes']}
-                />
+                {objectList.map((item,index)=>(
+                     <Select.Option
+                        key={item.value+':'+index}
+                        label={item.name+` ${overview[item.value] ? overview[item.value] : '..'}`}
+                        value={item.value}
+                        icon={item.icon}
+                    />
+                ))}
             </Select>
 
             <Select value={currentHost} onChange={handleHostChange}>
@@ -599,4 +575,4 @@ const DataInventory = ({ roles }) => {
     );
 };
 
-export default DataInventory;
+export default ObjectListComponent;

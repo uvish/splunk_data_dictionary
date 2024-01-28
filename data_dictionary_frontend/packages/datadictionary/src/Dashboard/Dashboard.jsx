@@ -4,22 +4,22 @@ import axios from 'axios';
 
 // Splunk UI Components
 import Button from '@splunk/react-ui/Button';
-import Text from '@splunk/react-ui/Text';
 import TabLayout from '@splunk/react-ui/TabLayout';
-import P from '@splunk/react-ui/Paragraph';
-import DL from '@splunk/react-ui/DefinitionList';
-import Link from '@splunk/react-ui/Link';
-import List from '@splunk/react-ui/List';
+import ListIcon from '@splunk/react-icons/List';
+import CirclesFour from '@splunk/react-icons/CirclesFour';
+import ChartColumnSquare from '@splunk/react-icons/ChartColumnSquare';
+import CylinderMagnifier from '@splunk/react-icons/CylinderMagnifier';
+import BellDot from '@splunk/react-icons/BellDot';
+import TableSlide from '@splunk/react-icons/TableSlide';
+import CylinderIndex from '@splunk/react-icons/CylinderIndex';
 
 // Other Components
 import Overview from '../Overview/Overview';
-import KO from '../KO/KO';
 
 // Helper Functions
 import Session from '../Utils/Session'
-import DataInventory from '../DataInventory/DataInventory';
 import {Container} from '../CommonStyles';
-import { ScrollContainer } from './DashboardStyles';
+import ObjectListComponent from '../ObjectListComponent/ObjectListComponent';
 
 const Dashbaord = () => {
     const [roles, setRoles] = useState([]);
@@ -91,6 +91,24 @@ function TabContainer({ roles }) {
         setActivePanelId(panelId);
     };
 
+const enterpriseIconProps = {
+        hideDefaultTooltip: true,
+        screenReaderText: null,
+        size: '16px',
+    };
+
+const KO_LIST = [
+    {name:"Apps",value:"apps",icon: <CirclesFour {...enterpriseIconProps} variant="filled" />},
+    {name:"Dashbaords",value:"dashboards", icon: <ChartColumnSquare {...enterpriseIconProps} variant="filled" />},
+    {name:"Saved Searches",value:"savedSearches", icon: <CylinderMagnifier {...enterpriseIconProps} variant="filled" />},
+    {name:"Alerts",value:"alerts", icon: <BellDot {...enterpriseIconProps} variant="filled" />}
+]
+const DATA_INVENTORY_LIST = [
+    {name:"Lookups",value:"lookups", icon: <TableSlide {...enterpriseIconProps} variant="filled" />},
+    {name:"Fields",value:"fields", icon: <ListIcon {...enterpriseIconProps} variant="filled" />},
+    {name:"Index",value:"indexes", icon: <CylinderIndex {...enterpriseIconProps} variant="filled" />}
+]
+
     return (
         <Container>
             <Button label="Logout" appearance="destructive" onClick={()=>{Session.logout()}} />
@@ -100,10 +118,10 @@ function TabContainer({ roles }) {
                <Overview/>
             </TabLayout.Panel>
             <TabLayout.Panel label="KOs" panelId="kos" style={{ margin: 20 }}>
-                <KO roles={roles}/>
+                <ObjectListComponent roles={roles} objectList={KO_LIST} defaultObject={"apps"} />
             </TabLayout.Panel>
             <TabLayout.Panel label="Data Inventory" panelId="data_inventory" style={{ margin: 20 }}>
-               <DataInventory roles={roles}/>
+                <ObjectListComponent roles={roles} objectList={DATA_INVENTORY_LIST} defaultObject={"lookups"} />
             </TabLayout.Panel>
         </TabLayout>
         </Container>
