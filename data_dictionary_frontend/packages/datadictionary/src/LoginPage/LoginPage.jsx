@@ -47,8 +47,11 @@ const LoginPage = () => {
     }
   };
 
+  // CSS
+  const LoginDiv = {"width":"300px"};
+
   return (
-    <div>
+    <div style={LoginDiv}>
       <h2>Login Page</h2>
       <form>
         <label htmlFor="username">Username:</label>

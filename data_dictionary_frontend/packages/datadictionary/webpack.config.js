@@ -10,9 +10,9 @@ module.exports = webpackMerge(baseComponentConfig, {
         path: path.join(__dirname),
     },
     module: {
-        loaders: [
+        rules: [
           {
-            test: /\.css$/,
+            test: /\.css$/i,
             use: ['style-loader','css-loader'],
           },
         ],

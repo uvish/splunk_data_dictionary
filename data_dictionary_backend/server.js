@@ -177,7 +177,25 @@ app.delete('/cancelRequest/:key', async(req, res)=>{
     res.status(500).json({ error: error.message });
   }
 })
-// TODO : Implement UI for these
+
+app.delete('/deleteObject', async(req,res)=>{
+    let ObjectId = req.headers.id;
+    if(!ObjectId){
+      res.status(400).json({ error: "Object Id !" });
+    }
+    try{
+      let kv_response = await getRecordFromKV(`{"id":"${ObjectId}"}`)
+        if(kv_response.length > 0){
+          let splunk_response = await makeDeleteRequest(ObjectId) // delete from Splunk
+           if(splunk_response.data){
+              let kv_delete_response = await deleteRecordFromKV(kv_response[0]['_key'])
+             res.json(kv_delete_response);
+           }
+        }
+    }catch(error){
+      res.status(500).json({ error: error.message });
+    }
+})
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
@@ -215,6 +233,29 @@ async function getAllRecordsFromKV(type,host){
     }
     console.log(url)
     const response = await makeGetRequest(url);
+    return response.data;
+  }catch (error) {
+    console.error(`Error fetching data from KV ${error}`);
+    return error;
+  }
+}
+
+async function getRecordFromKV(query){
+  try{
+    let url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT}?query=${query}`;
+    console.log(url)
+    const response = await makeGetRequest(url);
+    return response.data;
+  }catch (error) {
+    console.error(`Error fetching data from KV ${error}`);
+    return error;
+  }
+}
+async function deleteRecordFromKV(key){
+  try{
+    let url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT}/${key}`;
+    console.log(url)
+    const response = await makeDeleteRequest(url);
     return response.data;
   }catch (error) {
     console.error(`Error fetching data from KV ${error}`);

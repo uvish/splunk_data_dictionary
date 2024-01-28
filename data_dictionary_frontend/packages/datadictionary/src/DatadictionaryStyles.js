@@ -10,6 +10,12 @@ const StyledContainer = styled.div`
     border-radius: ${variables.borderRadius};
     box-shadow: ${variables.overlayShadow};
     background-color: ${variables.backgroundColor};
+    height: 95vh;
+    width: 98vw;
+    display: flex;
+    flex-direction:column;
+    align-items: centre;
+    justify-content: centre'
 `;
 
 const StyledGreeting = styled.div`

@@ -18,6 +18,8 @@ import KO from '../KO/KO';
 // Helper Functions
 import Session from '../Utils/Session'
 import DataInventory from '../DataInventory/DataInventory';
+import {Container} from '../CommonStyles';
+import { ScrollContainer } from './DashboardStyles';
 
 const Dashbaord = () => {
     const [roles, setRoles] = useState([]);
@@ -65,6 +67,7 @@ const Dashbaord = () => {
           }
   }
 
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -89,17 +92,21 @@ function TabContainer({ roles }) {
     };
 
     return (
+        <Container>
+            <Button label="Logout" appearance="destructive" onClick={()=>{Session.logout()}} />
         <TabLayout autoActivate defaultActivePanelId="overview" activePanelId={activePanelId} onChange={handleChange}>
+            
             <TabLayout.Panel label="Overview" panelId="overview" style={{ margin: 20 }}>
                <Overview/>
             </TabLayout.Panel>
             <TabLayout.Panel label="KOs" panelId="kos" style={{ margin: 20 }}>
-               <KO roles={roles}/>
+                <KO roles={roles}/>
             </TabLayout.Panel>
             <TabLayout.Panel label="Data Inventory" panelId="data_inventory" style={{ margin: 20 }}>
                <DataInventory roles={roles}/>
             </TabLayout.Panel>
         </TabLayout>
+        </Container>
     );
 }
 

@@ -7,6 +7,9 @@ import Fuse from 'fuse.js';
 
 // Splunk UI Components
 import Select from '@splunk/react-ui/Select';
+import TableSlide from '@splunk/react-icons/TableSlide';
+import List from '@splunk/react-icons/List';
+import CylinderIndex from '@splunk/react-icons/CylinderIndex';
 import CirclesFour from '@splunk/react-icons/CirclesFour';
 import ChartColumnSquare from '@splunk/react-icons/ChartColumnSquare';
 import CylinderMagnifier from '@splunk/react-icons/CylinderMagnifier';
@@ -22,6 +25,11 @@ import Button from '@splunk/react-ui/Button';
 import Pencil from '@splunk/react-icons/Pencil';
 import ChevronsDoubleDownGuillemets from '@splunk/react-icons/ChevronsDoubleDownGuillemets';
 import MessageBar from '@splunk/react-ui/MessageBar';
+import TrashCanCross from '@splunk/react-icons/TrashCanCross';
+import NodeSplit from '@splunk/react-icons/NodeSplit';
+import Clock from '@splunk/react-icons/Clock';
+import { ScrollContainer } from '../CommonStyles';
+import Tooltip from '@splunk/react-ui/Tooltip';
 
 import P from '@splunk/react-ui/Paragraph';
 
@@ -45,16 +53,23 @@ const CANCEL_ACCESS_REQUEST = `${SPLUNK_SERVER_URL}/cancelRequest`;
 const ALL_PENDING_REQUESTS = `${SPLUNK_SERVER_URL}/allPendingRequests`;
 const APPROVE_REQUEST = `${SPLUNK_SERVER_URL}/approve-request`;
 const DENY_REQUEST = `${SPLUNK_SERVER_URL}/cancelRequest`;
-const RECORDS_PER_PAGE = 10;
+const DELETE_OBJECT = `${SPLUNK_SERVER_URL}/deleteObject`;
+const RECORDS_PER_PAGE = 15;
 
 const enterpriseIcons = {
     Apps: <CirclesFour {...enterpriseIconProps} variant="filled" />,
     Dashboards: <ChartColumnSquare {...enterpriseIconProps} variant="filled" />,
     SavedSearchs: <CylinderMagnifier {...enterpriseIconProps} variant="filled" />,
     Alerts: <BellDot {...enterpriseIconProps} variant="filled" />,
+    Lookups: <TableSlide {...enterpriseIconProps} variant="filled" />,
+    Fields: <List {...enterpriseIconProps} variant="filled" />,
+    Indexes: <CylinderIndex {...enterpriseIconProps} variant="filled" />,
     Hosts: <Globe {...enterpriseIconProps} variant="filled" />,
     Edit: <Pencil {...enterpriseIconProps} />,
     GetAccess: <ChevronsDoubleDownGuillemets {...enterpriseIconProps} />,
+    Trash: <TrashCanCross {...enterpriseIconProps}/>,
+    Share: <NodeSplit  {...enterpriseIconProps}/>,
+    Wait: <Clock {...enterpriseIconProps}/>
 };
 
 const fuseOptions = {
@@ -163,7 +178,7 @@ const KO = ({ roles }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // setLoading(true);
+                setLoading(true);
                 // Fetch KOs..
                 const url =
                     currentHost !== 'all'
@@ -333,6 +348,29 @@ const KO = ({ roles }) => {
         await makeDeleteRequest(DENY_REQUEST + `/${object['_key']}`);
         await updatePendingRequests();
     };
+    const handleDeleteObject = async (object) =>{
+        console.log("Deleting:"+object.id);
+        let response = await axios.delete(DELETE_OBJECT, {
+            headers: { Authorization: `Splunk ${Session.getSessionKey()}`,"id":object.id },
+        });
+            let currentData = data;
+            let newData = currentData.filter(row => row.id !== object.id);
+            setData(newData)
+            window.location.reload();
+            showBanner('Deleted')
+    }
+    const copyToClipboard = (url) =>{
+        navigator.clipboard.writeText(url)
+          .then(() => {
+            console.log('Url copied to clipboard');
+          })
+          .catch(err => {
+            console.error('Unable to copy url to clipboard', err);
+          });
+    }
+    const truncateText = (text, maxLength) => {
+        return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+      };
 
     return (
         <div>
@@ -481,7 +519,7 @@ const KO = ({ roles }) => {
                 <div>
                     <Table stripeRows>
                         <Table.Head>
-                            <Table.HeadCell>Id</Table.HeadCell>
+                            {/* <Table.HeadCell>Id</Table.HeadCell> */}
                             <Table.HeadCell>Name</Table.HeadCell>
                             <Table.HeadCell>Description</Table.HeadCell>
                             <Table.HeadCell>Owner</Table.HeadCell>
@@ -493,15 +531,18 @@ const KO = ({ roles }) => {
                         <Table.Body>
                             {paginatedData.map((row) => (
                                 <Table.Row key={row.id}>
-                                    <Table.Cell>{row.id}</Table.Cell>
+                                    {/* <Table.Cell>{row.id}</Table.Cell> */}
                                     <Table.Cell>{row.object_info.name}</Table.Cell>
-                                    <Table.Cell>{row.object_info.description}</Table.Cell>
+                                    <Tooltip contentRelationship="label" content={(row.object_info.description)} style={{ margin: '0 10px' }}>
+                                    <Table.Cell>{truncateText(row.object_info.description,100)}</Table.Cell>
+                                    </Tooltip>
                                     <Table.Cell>{row.object_info.owner}</Table.Cell>
                                     <Table.Cell>{row.custom_meta_label}</Table.Cell>
                                     <Table.Cell>{row.custom_classification}</Table.Cell>
                                     <Table.Cell>{row.splunk_host}</Table.Cell>
                                     <Table.Cell>
                                         {isAdmin ? (
+                                            <div>
                                             <Button
                                                 onClick={() => {
                                                     handleEditModalOpen(row);
@@ -510,12 +551,22 @@ const KO = ({ roles }) => {
                                                 label="Edit"
                                                 icon={enterpriseIcons.Edit}
                                             />
+                                            <Button
+                                                onClick={() => {
+                                                    handleDeleteObject(row);
+                                                }}
+                                                label="Delete"
+                                                icon={enterpriseIcons.Trash}
+                                            />
+                                            </div>
+                                            
                                         ) : (
                                             <Button
                                                 onClick={() => {
                                                     if (row.access_status === 'requested') {
                                                         cancelRequest(row);
                                                     } else if (row.access_status === 'approved') {
+                                                        copyToClipboard(row.id)
                                                         showBanner('Copied to clipboard');
                                                     } else {
                                                         handleGetAccess(row);
@@ -529,7 +580,12 @@ const KO = ({ roles }) => {
                                                         ? 'Share'
                                                         : 'Get Access'
                                                 }
-                                                icon={enterpriseIcons.GetAccess}
+                                                icon={
+                                                    row.access_status === 'requested'
+                                                    ? enterpriseIcons.Wait
+                                                    : row.access_status === 'approved'
+                                                    ? enterpriseIcons.Share : enterpriseIcons.GetAccess
+                                                }
                                             />
                                         )}
                                     </Table.Cell>

@@ -16,57 +16,57 @@ services:
       - splunk-var:/opt/splunk/var
       - splunk-etc:/opt/splunk/etc
 
-  # splunk-US:
-  #   image: splunk/splunk:latest
-  #   platform: linux/amd64
-  #   ports:
-  #     - "1000:8000"
-  #     - "1089:8089"
-  #     - "1088:8088"
-  #   environment:
-  #     - SPLUNK_START_ARGS=--accept-license
-  #     - SPLUNK_PASSWORD=Uvish123@
-  #     - OPTIMISTIC_ABOUT_FILE_LOCKING=1
-  #   volumes:
-  #     - splunk-var-us:/opt/splunk/var
-  #     - splunk-etc-us:/opt/splunk/etc
+  splunk-US:
+    image: splunk/splunk:latest
+    platform: linux/amd64
+    ports:
+      - "1000:8000"
+      - "1089:8089"
+      - "1088:8088"
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=Uvish123@
+      - OPTIMISTIC_ABOUT_FILE_LOCKING=1
+    volumes:
+      - splunk-var-us:/opt/splunk/var
+      - splunk-etc-us:/opt/splunk/etc
 
-  # splunk-EMEA:
-  #   image: splunk/splunk:latest
-  #   platform: linux/amd64
-  #   ports:
-  #     - "2000:8000"
-  #     - "2089:8089"
-  #     - "2088:8088"
-  #   environment:
-  #     - SPLUNK_START_ARGS=--accept-license
-  #     - SPLUNK_PASSWORD=Uvish123@
-  #     - OPTIMISTIC_ABOUT_FILE_LOCKING=1
-  #   volumes:
-  #     - splunk-var-emea:/opt/splunk/var
-  #     - splunk-etc-emea:/opt/splunk/etc
+  splunk-EMEA:
+    image: splunk/splunk:latest
+    platform: linux/amd64
+    ports:
+      - "2000:8000"
+      - "2089:8089"
+      - "2088:8088"
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=Uvish123@
+      - OPTIMISTIC_ABOUT_FILE_LOCKING=1
+    volumes:
+      - splunk-var-emea:/opt/splunk/var
+      - splunk-etc-emea:/opt/splunk/etc
 
-  # splunk-APAC:
-  #   image: splunk/splunk:latest
-  #   platform: linux/amd64
-  #   ports:
-  #     - "3000:8000"
-  #     - "3089:8089"
-  #     - "3088:8088"
-  #   environment:
-  #     - SPLUNK_START_ARGS=--accept-license
-  #     - SPLUNK_PASSWORD=Uvish123@
-  #     - OPTIMISTIC_ABOUT_FILE_LOCKING=1
-  #   volumes:
-  #     - splunk-var-apac:/opt/splunk/var
-  #     - splunk-etc-apac:/opt/splunk/etc
+  splunk-APAC:
+    image: splunk/splunk:latest
+    platform: linux/amd64
+    ports:
+      - "3000:8000"
+      - "3089:8089"
+      - "3088:8088"
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD=Uvish123@
+      - OPTIMISTIC_ABOUT_FILE_LOCKING=1
+    volumes:
+      - splunk-var-apac:/opt/splunk/var
+      - splunk-etc-apac:/opt/splunk/etc
 
 volumes:
   splunk-var:
   splunk-etc:
-  # splunk-var-us:
-  # splunk-etc-us:
-  # splunk-var-emea:
-  # splunk-etc-emea:
-  # splunk-var-apac:
-  # splunk-etc-apac:
+  splunk-var-us:
+  splunk-etc-us:
+  splunk-var-emea:
+  splunk-etc-emea:
+  splunk-var-apac:
+  splunk-etc-apac:
