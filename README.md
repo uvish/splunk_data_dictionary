@@ -11,6 +11,7 @@
 * Once Docker Desktop is running , from the 'splunk_data_dictionary' directory , use command 
 ```docker compose up -d```.
 * 7 Docker containers will be started , wait for all splunk instances to initialize, Check the 'enumerator' container logs to see if all Splunk hosts are ready and serving.
+* Run the shell script 'prepareKv.sh' in splunk_enumerator directory , to create the required collections , when setting up for first time.
 
 ![Flow](splunk.drawio.png)
 
