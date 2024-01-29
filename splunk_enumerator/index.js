@@ -1,8 +1,23 @@
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const https = require('https');
+const express = require('express');
+const app = express();
 
-const config = require('./config.json')
+app.listen(1111, () => {
+  console.log(`Server is running on http://localhost:${1111}`);
+});
+
+let healthy = true;
+
+let config;
+if (process.env.DOCKER_CONTAINER === 'true') {
+  console.log("Loading Docker Config");
+  config = require('./config_docker.json');
+  console.log(JSON.stringify(config));
+} else {
+  config = require('./config.json');
+}
 
 const UPDATE_INTERVAL = 5000 ; //every 5 seconds
 
@@ -77,6 +92,7 @@ async function generatePayload() {
 
       let updateList = incomingList.filter(obj2 => !currentList.some(obj1 => obj1.id === obj2.id));
 
+      healthy = true;
       console.log('------------------------------------------')
       console.log("Total KV Records:"+currentList.length)
       console.log(`Checking ${instance.name} ${instance.hostname}`)
@@ -98,6 +114,7 @@ async function generatePayload() {
       await updateNewSplunkInstanceInLedger(instance.hostname,instance.name);
     }
   } catch (error) {
+    healthy = false;
     console.error(`An error occurred: ${error.message}`);
   }
 }
@@ -227,4 +244,13 @@ async function fetchRecords(instance, type, endpoint){
     return { instanceName: instance.name, error: error.message };
   }
 }
+
+app.get('/ping', async (req, res) => {
+  if(healthy){
+    res.json({"healthy":"ok"})
+  }else{
+    res.status(500).json({ error: 'Waiting for Splunk Instances..' });
+  }
+})
+
 

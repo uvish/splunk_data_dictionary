@@ -4,7 +4,12 @@ const https = require('https');
 const cors = require('cors')
 
 const app = express();
-const conf = require('./config.json');
+let conf;
+if (process.env.DOCKER_CONTAINER === 'true') {
+    conf = require('./config_docker.json');
+  } else {
+    conf = require('./config.json');
+  }
 const port = conf.app.port;
 const KV_ENDPONT = `/servicesNS/nobody/${conf.splunk_dictionary_instance.appName}/storage/collections/data/${conf.splunk_dictionary_instance.collectionName}`;
 const KV_ENDPONT_SPLUNK_HOSTS = `/servicesNS/nobody/${conf.splunk_dictionary_instance.appName}/storage/collections/data/${conf.splunk_dictionary_instance.ledgerCollectionName}`;

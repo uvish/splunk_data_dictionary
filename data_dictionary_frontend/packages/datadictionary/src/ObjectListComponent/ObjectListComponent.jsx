@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import config from '../../../../config.json';
+let config;
+if (process.env.DOCKER_CONTAINER === 'true') {
+    config = require('../../../../config_docker.json');
+  } else {
+    config = require('../../../../config.json');
+  }
 
 // External Libraries
 import axios from 'axios';

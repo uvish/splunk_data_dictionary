@@ -61,6 +61,51 @@ services:
       - splunk-var-apac:/opt/splunk/var
       - splunk-etc-apac:/opt/splunk/etc
 
+
+  enumerator:
+    build:
+      context: ./splunk_enumerator
+    container_name: enumerator
+    depends_on:
+      - splunk-US
+      - splunk-EMEA
+      - splunk-APAC
+      - splunk-main
+    environment:
+      - DOCKER_CONTAINER=true
+    healthcheck:
+      test: ["CMD","curl", "--fail" ,"http://localhost:1111/ping || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+    restart: on-failure
+    stop_signal: SIGKILL
+
+
+  backend:
+    build:
+      context: ./data_dictionary_backend
+    container_name: backend
+    depends_on:
+      - splunk-main
+    ports:
+      - "3333:3333" 
+    environment:
+      - DOCKER_CONTAINER=true
+
+
+  frontend:
+    build:
+      context: ./data_dictionary_frontend
+    container_name: frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:8080" 
+    environment:
+      - DOCKER_CONTAINER=true
+  
+
 volumes:
   splunk-var:
   splunk-etc:

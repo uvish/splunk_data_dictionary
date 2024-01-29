@@ -1,0 +1,30 @@
+{
+    "splunk_instances":[
+        {
+            "name": "US",
+            "hostname": "https://splunk-US:8089",
+            "username": "admin",
+            "password": "Uvish123@"
+        },
+        {
+            "name": "EMEA",
+            "hostname": "https://splunk-EMEA:8089",
+            "username": "admin",
+            "password": "Uvish123@"
+        },
+        {
+            "name": "APAC",
+            "hostname": "https://splunk-APAC:8089",
+            "username": "admin",
+            "password": "Uvish123@"
+        }
+    ],
+    "splunk_dictionary_instance":{
+        "hostname": "https://splunk-main:8089",
+        "username": "admin",
+        "password": "Uvish123@",
+        "collectionName": "data_dictionary",
+        "ledgerCollectionName": "splunk_hosts",
+        "appName": "splunk_data_dictionary"
+    }
+}

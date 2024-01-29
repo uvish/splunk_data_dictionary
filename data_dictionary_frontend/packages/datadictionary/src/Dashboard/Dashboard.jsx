@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import config from '../../../../config.json';
+
+let config;
+if (process.env.DOCKER_CONTAINER === 'true') {
+    config = require('../../../../config_docker.json');
+  } else {
+    config = require('../../../../config.json');
+  }
+
 import axios from 'axios';
 
 // Splunk UI Components

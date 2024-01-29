@@ -1,0 +1,14 @@
+{
+    "splunk_dictionary_instance":{
+        "username":"admin",
+        "password":"Uvish123@",
+        "hostname":"https://splunk-main:8089",
+        "appName": "splunk_data_dictionary",
+        "collectionName": "data_dictionary",
+        "ledgerCollectionName": "splunk_hosts",
+        "requestApproveCollectionName": "request_approve"
+    },
+    "app":{
+        "port":3333
+    }
+}

@@ -5,7 +5,12 @@ const https = require('https');
 const httpProxy = require('http-proxy');
 const proxy = httpProxy.createProxyServer({ secure: false });
 
-const conf = require('./config.json');
+let conf;
+if (process.env.DOCKER_CONTAINER === 'true') {
+    conf = require('./config_docker.json');
+  } else {
+    conf = require('./config.json');
+  }
 const splunkConfig = conf.splunk_dictionary_instance;
 
 router.all('/*', (req, res) => {

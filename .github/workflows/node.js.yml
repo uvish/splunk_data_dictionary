@@ -26,6 +26,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: ./data_dictionary_frontend/packages/datadictionary/package-lock.json
-    - run: npm ci
-    - run: npm run build --prefix data_dictionary_frontend/packages/datadictionary
+        cache-dependency-path: './data_dictionary_frontend/packages/datadictionary/package-lock.json'
+    - run: yarn install
+    - run: yarn run build --prefix data_dictionary_frontend/packages/datadictionary

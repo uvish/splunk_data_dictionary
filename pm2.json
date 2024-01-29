@@ -1,0 +1,23 @@
+{
+    "apps": [
+      {
+        "name": "SplunkEnumerator",
+        "script": "node splunk_enumerator/index.js",
+        "instances": 1,
+        "exec_mode": "fork"
+      },
+      {
+        "name": "DataDictionaryBackend",
+        "script": "node data_dictionary_backend/server.js",
+        "instances": 1,
+        "exec_mode": "fork"
+      },
+      {
+        "name": "DataDictionaryFrontend",
+        "script": "npm run start:demo --prefix data_dictionary_frontend/packages/datadictionary",
+        "instances": 1,
+        "exec_mode": "fork"
+      }
+    ]
+  }
+  

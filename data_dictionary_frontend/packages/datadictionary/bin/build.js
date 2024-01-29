@@ -27,7 +27,7 @@ const runCommands = {
     },
     nix: {
         build: () => shell.exec('export NODE_ENV=production && ./node_modules/.bin/webpack -p'),
-        demo: () => shell.exec('./node_modules/.bin/webpack-dev-server --config demo/webpack.standalone.config.js --port ${DEMO_PORT-8080}'),
+        demo: () => shell.exec('./node_modules/.bin/webpack-dev-server --config demo/webpack.standalone.config.js --port ${DEMO_PORT-8080} --host 0.0.0.0'),
         link: () => shell.exec('ln -s $PWD/demo/splunk-app $SPLUNK_HOME/etc/apps/datadictionary-demo-app'),
     },
 };

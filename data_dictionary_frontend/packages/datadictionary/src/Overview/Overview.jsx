@@ -9,7 +9,13 @@ import styles from './Overview.style.json';
 // Util Functions
 import Session from '../Utils/Session';
 
-import config from '../../../../config.json';
+let config;
+if (process.env.DOCKER_CONTAINER === 'true') {
+    config = require('../../../../config_docker.json');
+  } else {
+    config = require('../../../../config.json');
+  }
+  
 const splunk_server_url = config.splunk.server_url;
 const OVERVIEW_ENDPOINT = splunk_server_url+`/overview`;
 
