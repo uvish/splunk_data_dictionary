@@ -87,7 +87,7 @@ services:
       context: ./data_dictionary_backend
     container_name: backend
     depends_on:
-      - splunk-main
+      - enumerator
     ports:
       - "3333:3333" 
     environment:
