@@ -1,8 +1,8 @@
 
 {
-    "card":{
-        "margin":"20px"
-    },
+"card":{
+    "margin":"20px"
+},
 "cardContainer": {
  "display": "flex",
  "flexDirection": "column",
@@ -27,5 +27,24 @@
     "height": "30%",
     "width": "100%",
     "font-size":"20px"
+},
+"dashboards":{
+    "background": "linear-gradient(135deg, #348A43, #649275)"
+},
+"reports":{
+    "background": "linear-gradient(135deg, #B97416, #E96A3A)"
+},
+"lookups":{
+    "background": "linear-gradient(135deg, #712965, #B64E3E)"
+},
+"indexes":{
+    "background": "linear-gradient(135deg, #3C86AD, #9139E1)"
+},
+"apps":{
+    "background": "linear-gradient(135deg, #E23F43, #FC4031)"
+},
+"savedSearches":{
+    "background": "linear-gradient(135deg, #A8982C, #979577)"
 }
+
 }

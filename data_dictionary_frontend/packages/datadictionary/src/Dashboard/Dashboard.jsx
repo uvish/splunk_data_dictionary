@@ -19,9 +19,13 @@ import CylinderMagnifier from '@splunk/react-icons/CylinderMagnifier';
 import BellDot from '@splunk/react-icons/BellDot';
 import TableSlide from '@splunk/react-icons/TableSlide';
 import CylinderIndex from '@splunk/react-icons/CylinderIndex';
+import Moon from '@splunk/react-icons/Moon';
+import Sun from '@splunk/react-icons/Sun';
+import Portrait from '@splunk/react-icons/Portrait';
 
 // Other Components
 import Overview from '../Overview/Overview';
+import styles from './style.json';
 
 // Helper Functions
 import Session from '../Utils/Session'
@@ -116,9 +120,38 @@ const DATA_INVENTORY_LIST = [
     {name:"Index",value:"indexes", icon: <CylinderIndex {...enterpriseIconProps} variant="filled" />}
 ]
 
+  
+const iconProps = {
+    screenReaderText: null,
+    height: '16px',
+    width: '16px',
+};
+
+const ThemeToggle = () => {
+    let colorScheme = localStorage.getItem('theme');
+  
+    const toggleTheme = () => {
+        localStorage.setItem('theme',colorScheme === 'dark' ? 'light' : 'dark');
+        window.location.reload();
+    };
+
+    return (
+      <div style={colorScheme === "dark"? styles.toggleContainerLight : styles.toggleContainerDark}>
+        <Button style={ styles.toggleButton} onClick={toggleTheme} icon={ colorScheme === "dark"? <Sun {...iconProps}/> :  <Moon {...iconProps}/>}>
+        </Button>
+      </div>
+    );
+  };
+
     return (
         <Container>
-            <Button label="Logout" appearance="destructive" onClick={()=>{Session.logout()}} />
+            <div style={styles.logoutDiv}>
+                <span></span>
+            <div style={styles.logoutDiv}>
+                <p style={{"margin-right":"30px"}}><Portrait {...iconProps}/>   {Session.getUserName()}</p>
+              <Button style={styles.logoutButton} label="Logout" appearance="destructive" onClick={()=>{Session.logout()}} />
+              </div>
+            </div>
         <TabLayout autoActivate defaultActivePanelId="overview" activePanelId={activePanelId} onChange={handleChange}>
             
             <TabLayout.Panel label="Overview" panelId="overview" style={{ margin: 20 }}>
@@ -131,6 +164,7 @@ const DATA_INVENTORY_LIST = [
                 <ObjectListComponent roles={roles} objectList={DATA_INVENTORY_LIST} defaultObject={"lookups"} />
             </TabLayout.Panel>
         </TabLayout>
+        <ThemeToggle/>
         </Container>
     );
 }

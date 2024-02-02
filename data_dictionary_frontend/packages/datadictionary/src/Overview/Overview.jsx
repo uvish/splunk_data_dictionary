@@ -59,12 +59,12 @@ const Overview = () =>{
              </div>
         ):(
             <div>
-                <CustomCard name={"Dashboard"} count={overview.dashboards}/>
-                <CustomCard name={"Reports"} count={overview.reports}/>
-                <CustomCard name={"Lookups"} count={overview.lookups}/>
-                <CustomCard name={"Indexes"} count={overview.indexes}/>
-                <CustomCard name={"Apps"} count={overview.apps}/>
-                <CustomCard name={"Saved Searches"} count={overview.savedSearches}/>
+                <CustomCard name={"Dashboard"} count={overview.dashboards} color={styles.dashboards}/>
+                <CustomCard name={"Reports"} count={overview.reports}  color={styles.reports}/>
+                <CustomCard name={"Lookups"} count={overview.lookups}  color={styles.lookups}/>
+                <CustomCard name={"Indexes"} count={overview.indexes}  color={styles.indexes}/>
+                <CustomCard name={"Apps"} count={overview.apps}  color={styles.apps}/>
+                <CustomCard name={"Saved Searches"} count={overview.savedSearches}  color={styles.savedSearches}/>
              </div>
         )}
         </div>
@@ -73,9 +73,9 @@ const Overview = () =>{
 
 
 
-const CustomCard =({name,count})=>{
+const CustomCard =({name,count,color})=>{
     return (
-        <Card style={styles.card}>
+        <Card style={{ ...styles.card, ...color}}>
             <Card.Body >
             <div style={styles.cardContainer}>
                 <div style={styles.header}>{count}</div>

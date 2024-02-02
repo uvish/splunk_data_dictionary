@@ -10,8 +10,10 @@ getUserTheme()
     .then((theme) => {
         const containerEl = document.getElementById('main-component-container');
         const splunkTheme = getThemeOptions(theme);
+        let colorTheme = localStorage.getItem('theme');
+        if(!colorTheme) colorTheme = "dark";
         render(
-            <SplunkThemeProvider {...splunkTheme} colorScheme="dark">
+            <SplunkThemeProvider {...splunkTheme} colorScheme={colorTheme}>
                 <Datadictionary/>
             </SplunkThemeProvider>,
             containerEl

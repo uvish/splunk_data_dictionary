@@ -1,0 +1,33 @@
+{
+    "toggleContainerDark": {
+      "position": "fixed",
+      "bottom": "20px",
+      "right": "20px",
+      "zIndex": "999"
+    },
+    "toggleContainerLight": {
+      "position": "fixed",
+      "bottom": "20px",
+      "right": "20px",
+      "zIndex": "999"
+    },
+    "toggleButton": {
+      "height":"50px",
+      "width":"50px",
+      "padding": "10px",
+      "color": "black", 
+      "border": "none",
+      "border-radius":"50%",
+      "background": "#e0e0e0"
+    },
+    "logoutDiv":{
+      "display": "flex",
+      "flex-direction":"row",
+      "justify-content": "end",
+      "align-items": "last baseline",
+      "height":"20px"
+    },
+    "logoutButton":{
+      
+    }
+  }
