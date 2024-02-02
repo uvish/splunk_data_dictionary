@@ -8,7 +8,7 @@ app.listen(1111, () => {
   console.log(`Server is running on http://localhost:${1111}`);
 });
 
-let healthy = true;
+let healthy = false;
 
 let config;
 if (process.env.DOCKER_CONTAINER === 'true') {
@@ -47,36 +47,9 @@ setInterval(()=>{
   }
 },UPDATE_INTERVAL);
 
-const sendToSplunk = async (message) => { 
-  
-  let payload = {
-    event : message
-  }
-      try {
-        const response = await axios.post(config.splunk_main.HEC_URL, payload, {
-          headers: {
-            Authorization: `Splunk ${config.splunk_main.Token}`,
-            // 'X-Splunk-Request-Channel': uuidv4(),
-            'Content-Type': 'application/json'
-          },
-        });
-
-        console.log(response.data)
-    
-        if (response.data && response.data.text === 'Success') {
-          console.log('Event successfully indexed');
-        } else {
-          console.error('Unexpected response from Splunk:', response.data);
-        }
-      } catch (error) {
-        console.error('Error sending event to Splunk:', error.message);
-      }
-
-};
-
 async function generatePayload() {
-  try {
     for (const instance of config.splunk_instances) {
+      try {
       let [dashboards, reports, savedSearches, lookups, indexes, apps, alerts] = await Promise.all([
         fetchRecords(instance, "Dashboard", SPLUNKD_ENDPOINTS.DASHBOARDS),
         fetchRecords(instance, "Report", SPLUNKD_ENDPOINTS.REPORTS),
@@ -112,11 +85,11 @@ async function generatePayload() {
       updateInProgress = false;
       console.log("Updated Records:"+result.length)
       await updateNewSplunkInstanceInLedger(instance.hostname,instance.name);
+    } catch (error) {
+      healthy = false;
+      console.error(`Waiting for Splunk: ${instance.hostname}`);
     }
-  } catch (error) {
-    healthy = false;
-    console.error(`An error occurred: ${error.message}`);
-  }
+    }
 }
 
 async function updateNewSplunkInstanceInLedger(hostname,name){
@@ -240,7 +213,6 @@ async function fetchRecords(instance, type, endpoint){
     }
     return responseData;
   } catch (error) {
-    console.error(`Error fetching data from ${instance.name}: ${error.message}`);
     return { instanceName: instance.name, error: error.message };
   }
 }
