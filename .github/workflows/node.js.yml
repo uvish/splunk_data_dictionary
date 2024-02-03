@@ -1,6 +1,3 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Node.js CI
 
 on:
@@ -16,8 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v3
@@ -25,7 +21,5 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: './data_dictionary_frontend/packages/datadictionary/package-lock.json'
-    - run: yarn install
-    - run: yarn run build --prefix data_dictionary_frontend/packages/datadictionary
+    - run: yarn --cwd data_dictionary_frontend/packages/datadictionary install
+    - run: yarn --cwd data_dictionary_frontend/packages/datadictionary build
