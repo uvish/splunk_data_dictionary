@@ -34,7 +34,7 @@ const KV_ENDPONT_DATA_DICTIONARY = `/servicesNS/nobody/${config.splunk_dictionar
 const KV_ENDPONT_SPLUNK_HOSTS = `/servicesNS/nobody/${config.splunk_dictionary_instance.appName}/storage/collections/data/${config.splunk_dictionary_instance.ledgerCollectionName}`;
 let updateInProgress = false;
 const collectAndSend = async () => {
-  const payload = generatePayload();
+  generatePayload();
 };
 
 setInterval(()=>{
@@ -109,7 +109,7 @@ async function updateNewSplunkInstanceInLedger(hostname,name){
     });
 
     if(response.data.length < 1){
-      const writeResponse = await axios.post(`${config.splunk_dictionary_instance.hostname}${KV_ENDPONT_SPLUNK_HOSTS}`, {
+      await axios.post(`${config.splunk_dictionary_instance.hostname}${KV_ENDPONT_SPLUNK_HOSTS}`, {
         name:name,
         hostname:hostname,
         id: uuidv4()

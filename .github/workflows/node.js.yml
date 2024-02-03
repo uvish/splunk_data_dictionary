@@ -23,3 +23,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: yarn --cwd data_dictionary_frontend/packages/datadictionary install
     - run: yarn --cwd data_dictionary_frontend/packages/datadictionary build
+    - run: yarn --cwd data_dictionary_backend install
+    - run: yarn --cwd data_dictionary_backend lint
+    - run: yarn --cwd splunk_enumerator install
+    - run: yarn --cwd splunk_enumerator lint

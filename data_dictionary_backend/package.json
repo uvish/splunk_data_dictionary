@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "lint": "eslint ."
   },
   "author": "ujjwal",
   "license": "ISC",
@@ -16,5 +17,8 @@
     "http-proxy": "^1.18.1",
     "nodemon": "^3.0.2",
     "splunk-sdk": "^2.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
   }
 }
