@@ -10,6 +10,7 @@ import axios from 'axios';
 // Splunk UI Components
 import Button from '@splunk/react-ui/Button';
 import Text from '@splunk/react-ui/Text';
+import OrganizerNotebook from '@splunk/react-icons/OrganizerNotebook';
 
 // Util Functions
 import Session from '../Utils/Session';
@@ -53,12 +54,28 @@ const LoginPage = () => {
   };
 
   // CSS
-  const LoginDiv = {"width":"300px"};
+  const LoginDiv = 
+  {
+    "width":"100%",
+    "height":"100%",
+    "display":"flex",
+    "flex-direction":"column",
+    "justify-content":"center",
+    "align-items":"center"
+  };
+  const loginForm = {
+    "width":"400px"
+  }
+  const icon = {
+    height:'100px',
+    width:'100px'
+  }
 
   return (
     <div style={LoginDiv}>
-      <h2>Login Page</h2>
-      <form>
+      <OrganizerNotebook {...icon}/>
+      <h2>Login</h2>
+      <form style={loginForm}>
         <label htmlFor="username">Username:</label>
         <Text
           type="text"
