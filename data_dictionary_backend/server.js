@@ -11,7 +11,7 @@ if (process.env.DOCKER_CONTAINER === 'true') {
     conf = require('./config.json');
   }
 const port = conf.app.port;
-const KV_ENDPONT = `/servicesNS/nobody/${conf.splunk_dictionary_instance.appName}/storage/collections/data/${conf.splunk_dictionary_instance.collectionName}`;
+const KV_ENDPONT_DICTIONARY = `/servicesNS/nobody/${conf.splunk_dictionary_instance.appName}/storage/collections/data/${conf.splunk_dictionary_instance.collectionName}`;
 const KV_ENDPONT_SPLUNK_HOSTS = `/servicesNS/nobody/${conf.splunk_dictionary_instance.appName}/storage/collections/data/${conf.splunk_dictionary_instance.ledgerCollectionName}`;
 const KV_ENDPONT_REQUEST_APPROVE = `/servicesNS/nobody/${conf.splunk_dictionary_instance.appName}/storage/collections/data/${conf.splunk_dictionary_instance.requestApproveCollectionName}`;
 
@@ -39,7 +39,8 @@ app.get('/overview', async (req, res) => {
       savedSearches: (await getAllRecordsFromKV("SavedSearch")).length,
       indexes: (await getAllRecordsFromKV("Index")).length,
       apps: (await getAllRecordsFromKV("App")).length,
-      alerts: (await getAllRecordsFromKV("Alert")).length
+      alerts: (await getAllRecordsFromKV("Alert")).length,
+      fields: (await getAllRecordsFromKV("Field")).length
     });
   } catch (error) {
     console.error('Unexpected error:', error);
@@ -83,6 +84,9 @@ app.get('/list', async (req, res) => {
       case 'alerts':
         res.json({ alerts: await getAllRecordsFromKV("Alert", req.query.splunk_host) });
         break;        
+      case 'fields':
+        res.json({fields: await getAllRecordsFromKV("Field", req.query.splunk_host)});
+        break;
       case 'apps':
         res.json({ apps: await getAllRecordsFromKV("App", req.query.splunk_host) });
         break;
@@ -93,7 +97,8 @@ app.get('/list', async (req, res) => {
           lookups: await getAllRecordsFromKV("Lookup" , req.query.splunk_host),
           savedSearches: await getAllRecordsFromKV("SavedSearch" , req.query.splunk_host),
           indexes: await getAllRecordsFromKV("Index" , req.query.splunk_host),
-          alerts: await getAllRecordsFromKV("Alert" , req.query.splunk_host)
+          alerts: await getAllRecordsFromKV("Alert" , req.query.splunk_host),
+          fields: await getAllRecordsFromKV("Field" , req.query.splunk_host)
         })
         break;
       default:
@@ -202,23 +207,26 @@ app.delete('/deleteObject', async(req,res)=>{
     }
 })
 
+// delete all kv data, data will be re-populated within next 5 seconds
+app.delete('/resetKV',async(req,res)=>{
+  try{
+    let deleteResponse = []
+    deleteResponse.push(await makeDeleteRequest(`${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT_DICTIONARY}`));
+    deleteResponse.push(await makeDeleteRequest(`${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT_REQUEST_APPROVE}`))
+    deleteResponse.push(await makeDeleteRequest(`${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT_SPLUNK_HOSTS}`))
+    res.json([KV_ENDPONT_DICTIONARY,KV_ENDPONT_REQUEST_APPROVE,KV_ENDPONT_SPLUNK_HOSTS])
+  }catch(err){
+    res.status(500).json({error:err.message});
+  }
+})
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-
-
-
-// async function getAllFieldValues(field){
-//   let searchQuery = `index="main" | stats values(${field}) as ${field}`;
-//   let response = await searchSplunk(searchQuery);
-//   return response[0].rows[0][0];
-// }
-
-
 async function updateRecord(key,newData){
       try{
-        const url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT}/${key}`;
+        const url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT_DICTIONARY}/${key}`;
         console.log(url);
         const respose = await makePostRequest(url,newData);
         return respose.data;
@@ -232,9 +240,9 @@ async function getAllRecordsFromKV(type,host){
   try{
     let url;
     if(host){
-      url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT}?query={"type":"${type}","splunk_host":"${host}"}`;
+      url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT_DICTIONARY}?query={"type":"${type}","splunk_host":"${host}"}`;
     }else{
-      url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT}?query={"type":"${type}"}`;
+      url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT_DICTIONARY}?query={"type":"${type}"}`;
     }
     console.log(url)
     const response = await makeGetRequest(url);
@@ -247,7 +255,7 @@ async function getAllRecordsFromKV(type,host){
 
 async function getRecordFromKV(query){
   try{
-    let url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT}?query=${query}`;
+    let url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT_DICTIONARY}?query=${query}`;
     console.log(url)
     const response = await makeGetRequest(url);
     return response.data;
@@ -258,7 +266,7 @@ async function getRecordFromKV(query){
 }
 async function deleteRecordFromKV(key){
   try{
-    let url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT}/${key}`;
+    let url = `${conf.splunk_dictionary_instance.hostname}${KV_ENDPONT_DICTIONARY}/${key}`;
     console.log(url)
     const response = await makeDeleteRequest(url);
     return response.data;

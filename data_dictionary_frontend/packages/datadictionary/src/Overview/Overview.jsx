@@ -65,6 +65,7 @@ const Overview = () =>{
                 <CustomCard name={"Indexes"} count={overview.indexes}  color={styles.indexes}/>
                 <CustomCard name={"Apps"} count={overview.apps}  color={styles.apps}/>
                 <CustomCard name={"Saved Searches"} count={overview.savedSearches}  color={styles.savedSearches}/>
+                <CustomCard name={"Fields"} count={overview.fields}  color={styles.fields}/>
              </div>
         )}
         </div>

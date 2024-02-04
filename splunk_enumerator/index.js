@@ -28,50 +28,46 @@ const SPLUNKD_ENDPOINTS = {
   LOOKUPS :        "/servicesNS/-/-/data/transforms/lookups",
   INDEXES :        "/servicesNS/-/-/data/indexes",
   APPS :           "/servicesNS/-/-/apps/local",
-  ALERTS :         "/services/alerts"
+  ALERTS :         "/services/alerts",
+  FIELDS :         "/services/search/fields"
 }
 const KV_ENDPONT_DATA_DICTIONARY = `/servicesNS/nobody/${config.splunk_dictionary_instance.appName}/storage/collections/data/${config.splunk_dictionary_instance.collectionName}`;
 const KV_ENDPONT_SPLUNK_HOSTS = `/servicesNS/nobody/${config.splunk_dictionary_instance.appName}/storage/collections/data/${config.splunk_dictionary_instance.ledgerCollectionName}`;
 let updateInProgress = false;
-const collectAndSend = async () => {
-  generatePayload();
-};
 
-setInterval(()=>{
+setInterval(async ()=>{
   if(!updateInProgress)
     {
-      collectAndSend()
+      await collectAndSend()
     }
-  else{
-    console.log("Update in Progress...");
-  }
 },UPDATE_INTERVAL);
 
-async function generatePayload() {
+async function collectAndSend() {
     for (const instance of config.splunk_instances) {
       try {
-      let [dashboards, reports, savedSearches, lookups, indexes, apps, alerts] = await Promise.all([
+      let [dashboards, reports, savedSearches, lookups, indexes, apps, alerts, fields] = await Promise.all([
         fetchRecords(instance, "Dashboard", SPLUNKD_ENDPOINTS.DASHBOARDS),
         fetchRecords(instance, "Report", SPLUNKD_ENDPOINTS.REPORTS),
         fetchRecords(instance, "SavedSearch", SPLUNKD_ENDPOINTS.SAVED_SEARCHES),
         fetchRecords(instance, "Lookup", SPLUNKD_ENDPOINTS.LOOKUPS),
         fetchRecords(instance, "Index", SPLUNKD_ENDPOINTS.INDEXES),
         fetchRecords(instance, "App", SPLUNKD_ENDPOINTS.APPS),
-        fetchRecords(instance, "Alert", SPLUNKD_ENDPOINTS.ALERTS)
+        fetchRecords(instance, "Alert", SPLUNKD_ENDPOINTS.ALERTS),
+        fetchRecords(instance, "Field", SPLUNKD_ENDPOINTS.FIELDS)
       ]);
 
-      let incomingList = [...dashboards, ...reports, ...savedSearches, ...lookups, ...indexes, ...apps, ...alerts];
+      let incomingList = [...dashboards, ...reports, ...savedSearches, ...lookups, ...indexes, ...apps, ...alerts, ...fields];
       let currentList = await getAllRecordsFromKV();
 
       let updateList = incomingList.filter(obj2 => !currentList.some(obj1 => obj1.id === obj2.id));
 
       healthy = true;
-      console.log('------------------------------------------')
-      console.log("Total KV Records:"+currentList.length)
-      console.log(`Checking ${instance.name} ${instance.hostname}`)
-      console.log(` ↪ Current Records in ${instance.name} :`+incomingList.length)
-      console.log(" ↪ New Records Pending Update:"+updateList.length)
-      console.log('------------------------------------------')
+
+      let thisInstanceList = currentList.filter((record)=>{
+        return record.splunk_host == instance.hostname
+      })
+
+      console.log(`${getCurrentTime()} | Splunk ${instance.name} \t | Records: ${incomingList.length} \t | Indexed: ${thisInstanceList.length} \t | Pending: ${updateList.length}`)
 
       // Add New Pending Records in KV
       let result = []
@@ -83,13 +79,15 @@ async function generatePayload() {
       }
       updateList = [];
       updateInProgress = false;
-      console.log("Updated Records:"+result.length)
+      // console.log("Updated Records:"+result.length)
       await updateNewSplunkInstanceInLedger(instance.hostname,instance.name);
     } catch (error) {
       healthy = false;
       console.error(`Waiting for Splunk: ${instance.hostname}`);
     }
     }
+    if(healthy)
+    console.log('=========================================================================================')
 }
 
 async function updateNewSplunkInstanceInLedger(hostname,name){
@@ -177,6 +175,14 @@ async function writeRecordToKV(record){
   }
 }
 
+function getCurrentTime() {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+}
+
 async function fetchRecords(instance, type, endpoint){
   try {
     const response = await axios.get(`${instance.hostname}${endpoint}`, {
@@ -200,13 +206,13 @@ async function fetchRecords(instance, type, endpoint){
         {
           "splunk_host" :instance.hostname,
           "type": type,
-          "id": entry.id,
+          "id": type=="Field" ? instance.hostname+entry.id : entry.id,
           "timestamp": entry.updated,
           "custom_classification": "Unclassified",
           "object_info":{
             "name": entry.name,
-            "description": entry.content.description || "no description",
-            "owner": entry.acl.owner
+            "description": entry.content?.description || "no description",
+            "owner": entry.acl?.owner || ""
           }
         }
       )
@@ -224,5 +230,4 @@ app.get('/ping', async (req, res) => {
     res.status(500).json({ error: 'Waiting for Splunk Instances..' });
   }
 })
-
 

@@ -66,6 +66,8 @@ services:
     build:
       context: ./splunk_enumerator
     container_name: enumerator
+    ports:
+      - "1111:1111"
     depends_on:
       - splunk-US
       - splunk-EMEA

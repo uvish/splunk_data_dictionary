@@ -29,22 +29,31 @@
     "font-size":"20px"
 },
 "dashboards":{
-    "background": "linear-gradient(135deg, #348A43, #649275)"
+    "background": "linear-gradient(135deg, #348A43, #649275)",
+    "border-radius":"10px"
 },
 "reports":{
-    "background": "linear-gradient(135deg, #B97416, #E96A3A)"
+    "background": "linear-gradient(135deg, #B97416, #E96A3A)",
+    "border-radius":"10px"
 },
 "lookups":{
-    "background": "linear-gradient(135deg, #712965, #B64E3E)"
+    "background": "linear-gradient(135deg, #712965, #B64E3E)",
+    "border-radius":"10px"
 },
 "indexes":{
-    "background": "linear-gradient(135deg, #3C86AD, #9139E1)"
+    "background": "linear-gradient(135deg, #3C86AD, #9139E1)",
+    "border-radius":"10px"
 },
 "apps":{
-    "background": "linear-gradient(135deg, #E23F43, #FC4031)"
+    "background": "linear-gradient(135deg, #E23F43, #FC4031)",
+    "border-radius":"10px"
 },
 "savedSearches":{
-    "background": "linear-gradient(135deg, #A8982C, #979577)"
+    "background": "linear-gradient(135deg, #A8982C, #979577)",
+    "border-radius":"10px"
+},
+"fields":{
+    "background": "linear-gradient(135deg, #35C3C5, #4E8515)",
+    "border-radius":"10px"
 }
-
 }

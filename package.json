@@ -6,7 +6,10 @@
   "dependencies": {},
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "validate_frontend":"yarn --cwd data_dictionary_frontend/packages/datadictionary install && yarn --cwd data_dictionary_frontend/packages/datadictionary build",
+    "validate_worker":"yarn --cwd splunk_enumerator install && yarn --cwd splunk_enumerator lint",
+    "validate_backend":"yarn --cwd data_dictionary_backend install && yarn --cwd data_dictionary_backend lint"
   },
   "repository": {
     "type": "git",
