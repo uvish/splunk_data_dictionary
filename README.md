@@ -30,4 +30,4 @@
 * 8000 | 8089 : Splunk DataDictionary UI | API
 
 ## Credentials
-All splunk instances use ```admin / Uvish123@``` as username and password for admin account.
+All splunk instances use ```admin / U123@``` as username and password for admin account.
