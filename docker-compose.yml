@@ -10,7 +10,7 @@ services:
       - "8088:8088"
     environment:
       - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=Uvish123@
+      - SPLUNK_PASSWORD=U123@
       - OPTIMISTIC_ABOUT_FILE_LOCKING=1
     volumes:
       - splunk-var:/opt/splunk/var
@@ -25,7 +25,7 @@ services:
       - "1088:8088"
     environment:
       - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=Uvish123@
+      - SPLUNK_PASSWORD=U123@
       - OPTIMISTIC_ABOUT_FILE_LOCKING=1
     volumes:
       - splunk-var-us:/opt/splunk/var
@@ -40,7 +40,7 @@ services:
       - "2088:8088"
     environment:
       - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=Uvish123@
+      - SPLUNK_PASSWORD=U123@
       - OPTIMISTIC_ABOUT_FILE_LOCKING=1
     volumes:
       - splunk-var-emea:/opt/splunk/var
@@ -55,7 +55,7 @@ services:
       - "3088:8088"
     environment:
       - SPLUNK_START_ARGS=--accept-license
-      - SPLUNK_PASSWORD=Uvish123@
+      - SPLUNK_PASSWORD=U123@
       - OPTIMISTIC_ABOUT_FILE_LOCKING=1
     volumes:
       - splunk-var-apac:/opt/splunk/var
